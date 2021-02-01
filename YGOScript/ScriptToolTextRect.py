@@ -6,6 +6,12 @@ from tkinter import *
 import pytesseract
 import win32api
 
+def rotate_image(image, angle):
+  image_center = tuple(np.array(image.shape[1::-1]) / 2)
+  rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+  result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
+  return result
+
 def preprocessImg(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
@@ -39,5 +45,5 @@ while True:
     time.sleep(0.01)
 area_img=crop_image(dev.snapshot(),snapshot_rect)
 img=preprocessImg(area_img)
-print(pytesseract.image_to_string(img,lang="eng",config="--psm 7 --oem 3"))
+print(pytesseract.image_to_string(img,config="--psm 7 --oem 3"))
 show_origin_size(img,"asd")

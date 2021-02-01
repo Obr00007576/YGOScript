@@ -2,7 +2,6 @@ from airtest.core.api import *
 from airtest.aircv import *
 from pywinauto import*
 from tkinter import *
-import pytesseract
 import win32api
 
 def preprocessImg(image):
