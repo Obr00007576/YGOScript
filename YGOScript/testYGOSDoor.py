@@ -27,6 +27,15 @@ def preprocessImg(image):
 class testYGOScript(unittest.TestCase):
     #app to control
     dev=None
+
+    #self-defined exsits() to have shorter interval and timeout
+    def my_exists(v):
+        try:
+            pos = loop_find(v, timeout=0.2,interval=0.1)
+        except TargetNotFoundError:
+            return False
+        else:
+            return pos
     #check whether the text is in the given fixed area of a rect
     @staticmethod
     def exists_text(text,rect,angle=0):
@@ -56,6 +65,12 @@ class testYGOScript(unittest.TestCase):
             testYGOScript.dev.mouse.click(coords=cursor_pos)
         else:
             testYGOScript.dev.mouse.click(coords=win32api.GetCursorPos())
+    
+    @staticmethod
+    def my_swipe(pos1,pos2):
+        testYGOScript.dev.mouse.press(button="left",coords=pos1)
+        sleep(0.2)
+        testYGOScript.dev.mouse.release(button="left",coords=pos2)
 
 #preparation for the tests later - to set the dev as the application
 class testBeforeScript(testYGOScript):
@@ -84,10 +99,10 @@ class testEnterTheDoor(testYGOScript):
         pos=exists(Template(r"imgEnterTheDoor\\2.JPG"))
         if pos:
             touch(pos)
-        for i in range(40):
+        for i in range(43):
             sleep(0.2)
             testYGOScript.press([839,583])
-        sleep(2.5)
+        sleep(1)
         assert(True)
 
 #steps of battle
@@ -99,7 +114,7 @@ class testDueling(testYGOScript):
     def testDrawPhase():
         if testYGOScript.exists_text("Your Draw Phase",[937,79,1107,103]):
             sleep(1)
-            for i in range(0,7):
+            for i in range(0,11):
                 sleep(0.1)
                 testYGOScript.press([834,506])
     
@@ -132,13 +147,12 @@ class testDueling(testYGOScript):
             sleep(0.1)
             touch(pos)
         sleep(3)
-
         return False
 
     #check whether after this attack the enemy get 0 LP
     def isAttackToLose(boardIndex):
         if testYGOScript.exists_text("ATK",testDueling.ATKrects[boardIndex]):
-            swipe(testDueling.SwipePos[boardIndex][0],testDueling.SwipePos[boardIndex][1],duration=0.01,steps=1)
+            testYGOScript.my_swipe(testDueling.SwipePos[boardIndex][0],testDueling.SwipePos[boardIndex][1])
             testYGOScript.press(stop=True)
             testYGOScript.press(stop=True)
             sleep(1)
@@ -165,27 +179,25 @@ class testDueling(testYGOScript):
 #steps to end the battle to the main interface
 class testEnd(testYGOScript):
     def testEnd(self):
+        for i in range(0,3):
+            sleep(0.1)
+            testYGOScript.press(stop=True)
         testYGOScript.wait_text("NEXT",[798,900,878,933])
         touch([840,933])
-        for i in range(0,15):
+        for i in range(0,5):
             sleep(0.1)
             testYGOScript.press(stop=True)
-        wait(Template(r"imgEnd\\1.JPG"))
-        pos=exists(Template(r"imgEnd\\1.JPG"))
-        if pos:
-            touch(pos)
-        for i in range(0,14):
-            sleep(0.1)
-            testYGOScript.press(stop=True)
-        pos=exists(Template(r"imgEnd\\1.JPG"))
-        if pos:
-            touch(pos)
-        for i in range(0,10):
-            sleep(0.1)
-            testYGOScript.press(stop=True)
-        pos=exists(Template(r"imgEnd\\1.JPG"))
-        if pos:
-            touch(pos)
+        while(True):
+            for i in range(0,8):
+                sleep(0.1)
+                testYGOScript.press(stop=True)
+            pos=testYGOScript.my_exists(Template(r"imgEnd\\1.JPG"))
+            if pos:
+                touch(pos)
+            if testYGOScript.my_exists(Template(r"imgEnd\\2.JPG")):
+                break
+        sleep(2)
+        assert(True)
 
 if __name__=="__main__":
     suite=unittest.TestSuite()
