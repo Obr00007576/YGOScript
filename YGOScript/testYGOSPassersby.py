@@ -1,13 +1,16 @@
 # coding=utf-8
+from difflib import restore
 from sys import flags
 from airtest.core.api import *
 from airtest.aircv import *
-from pywinauto import*
+import pywinauto
+from pywinauto import *
 import unittest
 import pytesseract
 import cv2
-import win32gui
-import win32api
+from pywinauto.win32structures import HWND
+import win32api, win32con, win32gui, win32ui, win32service
+
 def no_double_click_time():
     return 0
 win32gui.GetDoubleClickTime = no_double_click_time
@@ -21,7 +24,12 @@ def preprocessImg(image):
 class testYGOScript(unittest.TestCase):
     #app to control
     dev=None
-
+    @staticmethod
+    def isInRect(pos,rect):
+        if pos[0]>=rect[0] and pos[1]>=rect[1] and pos[0]<=rect[2] and pos[1]<=rect[3]:
+            return True
+        return False
+    @staticmethod
     def my_exists(v):
         try:
             pos = loop_find(v, timeout=0.2,interval=0.1)
@@ -60,14 +68,16 @@ class testYGOScript(unittest.TestCase):
     @staticmethod
     def my_swipe(pos1,pos2):
         testYGOScript.dev.mouse.press(button="left",coords=pos1)
-        sleep(0.1)
+        sleep(0.3)
         testYGOScript.dev.mouse.release(button="left",coords=pos2)
 
 #preparation for the tests later - to set the dev as the application
 class testBeforeScript(testYGOScript):
     def testBeforeScript(self):
-        testYGOScript.dev=init_device(platform="Windows",uuid=findwindows.find_windows(title_re="Yu-Gi-Oh! DUEL LINKS")[0])
-        testYGOScript.dev.set_foreground()
+        hwnd=findwindows.find_windows(title_re="Yu-Gi-Oh! DUEL LINKS")[0]
+        testYGOScript.dev=init_device(platform="Windows",uuid=hwnd)
+        #win32gui.SwitchToThisWindow(hwnd)
+        win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
         #connect_device("Windows:///"+str(findwindows.find_windows(title_re="Yu-Gi-Oh! DUEL LINKS")[0]))
         assert(True)
 
@@ -83,29 +93,30 @@ class testFindKey(testYGOScript):
         assert(True)
 
 class testFindPasserby(testYGOScript):
-    area_rect=(724,550,1057,839)
+    area_rect=(723,500,1052,850)
     def recognizeFaces():
         cascade = cv2.CascadeClassifier("lbpcascade_animeface.xml")
         img=crop_image(testYGOScript.dev.snapshot(),testFindPasserby.area_rect)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
         faces=list(cascade.detectMultiScale(gray,scaleFactor = 1.1,minNeighbors = 5,minSize = (24, 24),flags=cv2.CASCADE_DO_ROUGH_SEARCH))
+        print(faces)
         if not faces:
             return ()
         else:
             [x,y,w,h] = faces[0]
-            return [x+w/2+724,y+h/2+550]
+            return [x+w/2+testFindPasserby.area_rect[0],y+h/2+testFindPasserby.area_rect[1]]
 
     def testFindPasserby(self):
         while True:
             pos=testFindPasserby.recognizeFaces()
-            if pos:
+            if pos and (not testYGOScript.isInRect(pos,[731,622,785,666]) or not testYGOScript.exists_text("PvP Arena",[721,943,800,961])):
                 touch(pos)
                 break
             else:
-                testYGOScript.my_swipe([1020,561],[780,561])
+                testYGOScript.my_swipe([1120,561],[850,561])
                 sleep(2.5)
-        for i in range(0,9):
+        for i in range(0,5):
             testYGOScript.press(cursor_pos=[839,583])
             sleep(0.2)
         wait(Template(r"imgFindPasserby\\1.JPG"))
@@ -114,17 +125,14 @@ class testFindPasserby(testYGOScript):
             touch(pos)
         while(not testYGOScript.exists_text("OK",[809,900,874,931])):
             sleep(0.2)
-        pos=testYGOScript.exists_text("OK",[809,900,874,931])
-        if pos:
-            touch([843,919])
-        testYGOScript.wait_text("NEXT",[798,900,878,933])
-        pos=testYGOScript.exists_text("NEXT",[798,900,878,933])
-        if pos:
-            touch([840,933])
+        if testYGOScript.exists_text("OK",[809,900,874,931]):
+            touch([838,915])
         while(True):
-            for i in range(0,8):
+            for i in range(0,4):
                 sleep(0.1)
-                testYGOScript.press(stop=True)
+                testYGOScript.press(cursor_pos=[835,878])
+            if testYGOScript.exists_text("NEXT",[798,900,878,933]):
+                touch([842,917])
             pos=testYGOScript.my_exists(Template(r"imgFindPasserby\\2.JPG"))
             if pos:
                 touch(pos)
@@ -133,7 +141,7 @@ class testFindPasserby(testYGOScript):
 
 if __name__=="__main__":
     suite=unittest.TestSuite()
-    suite.addTests([testBeforeScript("testBeforeScript")])
+    suite.addTest(testBeforeScript("testBeforeScript"))
     unittest.TextTestRunner().run(suite)
     while(True):
         suite=unittest.TestSuite()

@@ -29,6 +29,7 @@ class testYGOScript(unittest.TestCase):
     dev=None
 
     #self-defined exsits() to have shorter interval and timeout
+    @staticmethod
     def my_exists(v):
         try:
             pos = loop_find(v, timeout=0.2,interval=0.1)
@@ -69,7 +70,7 @@ class testYGOScript(unittest.TestCase):
     @staticmethod
     def my_swipe(pos1,pos2):
         testYGOScript.dev.mouse.press(button="left",coords=pos1)
-        sleep(0.2)
+        sleep(0.4)
         testYGOScript.dev.mouse.release(button="left",coords=pos2)
 
 #preparation for the tests later - to set the dev as the application
@@ -179,14 +180,11 @@ class testDueling(testYGOScript):
 #steps to end the battle to the main interface
 class testEnd(testYGOScript):
     def testEnd(self):
-        for i in range(0,3):
+        for i in range(0,10):
             sleep(0.1)
             testYGOScript.press(stop=True)
         testYGOScript.wait_text("NEXT",[798,900,878,933])
         touch([840,933])
-        for i in range(0,5):
-            sleep(0.1)
-            testYGOScript.press(stop=True)
         while(True):
             for i in range(0,8):
                 sleep(0.1)
@@ -201,7 +199,7 @@ class testEnd(testYGOScript):
 
 if __name__=="__main__":
     suite=unittest.TestSuite()
-    suite.addTests([testBeforeScript("testBeforeScript")])
+    suite.addTest(testBeforeScript("testBeforeScript"))
     unittest.TextTestRunner().run(suite)
     while(True):
         suite=unittest.TestSuite()
