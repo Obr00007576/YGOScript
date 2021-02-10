@@ -2,7 +2,7 @@ from airtest.core.api import *
 from airtest.aircv import *
 from pywinauto import*
 from tkinter import *
-import win32api
+import win32api,win32gui,win32con
 
 def preprocessImg(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -11,8 +11,10 @@ def preprocessImg(image):
 state_release=0x00
 prestate=win32api.GetKeyState(0x01)
 tk=Tk()
-dev=init_device(platform="Windows",uuid=findwindows.find_windows(title_re="Yu-Gi-Oh! DUEL LINKS")[0])
-dev.set_foreground()
+hwnd=findwindows.find_windows(title_re="Yu-Gi-Oh! DUEL LINKS")[0]
+dev=init_device(platform="Windows",uuid=hwnd)
+win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
+win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
 dev_pos=dev.get_pos()
 tk.attributes("-alpha", 0.3)
 tk.attributes("-topmost", True)
