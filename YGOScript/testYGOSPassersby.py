@@ -136,7 +136,10 @@ class testFindPasserby(testYGOScript):
         while True:
             facepos=None
             for pos in testFindPasserby.recognizeFaces():
-                if pos and (not testYGOScript.isInRect(pos,[731,622,785,666]) or not testYGOScript.exists_text("PvP Arena",[721,943,800,961])) and (not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("Gate",[577,945,630,962])):
+                cond1=not testYGOScript.isInRect(pos,[703,730,762,783]) or not testYGOScript.exists_text("Duel Studio",[1033,942,1116,963])
+                cond2=not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("Gate",[577,945,630,962])
+                cond3=not testYGOScript.isInRect(pos,[798,503,874,574]) or not testYGOScript.exists_text("Shop",[894,944,939,963])
+                if pos and cond1 and cond2 and cond3:
                     facepos=pos
                     break
             if facepos!=None:
@@ -153,7 +156,7 @@ class testFindPasserby(testYGOScript):
             touch([838,915])
         while(True):
             for i in range(0,3):
-                testYGOScript.press(cursor_pos=[835,878])
+                testYGOScript.press(cursor_pos=[497,821])
             if testYGOScript.exists_text("NEXT",[779,892,893,938]):
                 touch([842,917])
             pos=testYGOScript.my_exists(Template(r"imgFindPasserby\\2.JPG"))
@@ -161,7 +164,6 @@ class testFindPasserby(testYGOScript):
                 touch(pos)
             if testYGOScript.exists_text("Information",[1197,36,1312,60]):
                 break
-
 if __name__=="__main__":
     suite=unittest.TestSuite()
     suite.addTest(testBeforeScript("testBeforeScript"))

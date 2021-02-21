@@ -84,7 +84,7 @@ class testYGOScript(unittest.TestCase):
     def skip_talk():
         flag=False
         while True:
-            area_img=crop_image(testYGOScript.dev.snapshot(),[1166,944,1169,947])
+            area_img=crop_image(testYGOScript.dev.snapshot(),[758,766,761,769])
             for line in area_img:
                 for pix in line:
                     if pix[0]==255 and pix[1]==255 and pix[2]==255:
@@ -92,7 +92,7 @@ class testYGOScript(unittest.TestCase):
             if flag:
                 break
         while True:
-            area_img=crop_image(testYGOScript.dev.snapshot(),[1166,944,1169,947])
+            area_img=crop_image(testYGOScript.dev.snapshot(),[758,766,761,769])
             for line in area_img:
                 for pix in line:
                     if pix[0]!=255 or pix[1]!=255 or pix[2]!=255:
@@ -180,7 +180,7 @@ class testDueling(testYGOScript):
             for i in range(0,2):
                 sleep(0.1)
                 testYGOScript.press(stop=True)
-            sleep(1.1)
+            sleep(1.5)
             if testYGOScript.exists_text("LP: O",[1572,854,1659,898]) or testYGOScript.exists_text("LP: o",[1572,854,1659,898]):
                 while(not testYGOScript.exists_text("OK",[809,900,874,931])):
                     sleep(0.2)
