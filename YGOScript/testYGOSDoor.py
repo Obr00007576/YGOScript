@@ -191,11 +191,17 @@ class testDueling(testYGOScript):
     
     #dueling
     def testDueling():
-        for i in range(0,15):
+        for i in range(0,20):
             if testYGOScript.exists_text("Your Main Phase",[937,79,1107,103]):
                 testDueling.testMainPhase()
             else:
-                testYGOScript.wait_text("Your Draw Phase",[937,79,1107,103])
+                while not testYGOScript.exists_text("Your Draw Phase",[937,79,1107,103]):
+                    if testYGOScript.exists_text("LP: O",[1572,854,1659,898]) or testYGOScript.exists_text("LP: o",[1572,854,1659,898]):
+                        while(not testYGOScript.exists_text("OK",[809,900,874,931])):
+                            sleep(0.2)
+                        if testYGOScript.exists_text("OK",[809,900,874,931]):
+                            touch([838,915])
+                        return
                 testDueling.testDrawPhase()
                 testYGOScript.wait_text("Your Main Phase",[937,79,1107,103])
                 testDueling.testMainPhase()
