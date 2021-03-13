@@ -136,10 +136,9 @@ class testFindPasserby(testYGOScript):
         while True:
             facepos=None
             for pos in testFindPasserby.recognizeFaces():
-                cond1=not testYGOScript.isInRect(pos,[703,730,762,783]) or not testYGOScript.exists_text("Duel Studio",[1033,942,1116,963])
-                cond2=not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("Gate",[577,945,630,962])
-                cond3=not testYGOScript.isInRect(pos,[798,503,874,574]) or not testYGOScript.exists_text("Shop",[894,944,939,963])
-                if pos and cond1 and cond2 and cond3:
+                cond1=not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("Gate",[577,945,630,962])
+                cond2=not testYGOScript.isInRect(pos,[737,616,778,668]) or not testYGOScript.exists_text("PvP Arena",[719,944,801,961])
+                if pos and cond1 and cond2:
                     facepos=pos
                     break
             if facepos!=None:
