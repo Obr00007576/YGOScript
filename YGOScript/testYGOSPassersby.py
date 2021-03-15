@@ -54,7 +54,7 @@ class testYGOScript(unittest.TestCase):
     def exists_text(text,rect):
         img=crop_image(testYGOScript.dev.snapshot(),rect)
         img=preprocessImg(img)
-        textImg=pytesseract.image_to_string(img,lang="eng",config="--psm 7 --oem 3")
+        textImg=pytesseract.image_to_string(img,lang="chi_sim",config="--psm 7 --oem 3")
         if text in textImg:
             return True
         return False
@@ -96,7 +96,7 @@ class testYGOScript(unittest.TestCase):
 
 #preparation for the tests later - to set the dev as the application
 class testBeforeScript(testYGOScript):
-    def testBeforeScript(self):
+    def testBeforeScript():
         hwnd=findwindows.find_windows(title_re="Yu-Gi-Oh! DUEL LINKS")[0]
         testYGOScript.dev=init_device(platform="Windows",uuid=hwnd)
         win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
@@ -132,12 +132,12 @@ class testFindPasserby(testYGOScript):
             return globfaces
 
 
-    def testFindPasserby(self):
+    def testFindPasserby():
         while True:
             facepos=None
             for pos in testFindPasserby.recognizeFaces():
-                cond1=not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("Gate",[577,945,630,962])
-                cond2=not testYGOScript.isInRect(pos,[737,616,778,668]) or not testYGOScript.exists_text("PvP Arena",[719,944,801,961])
+                cond1=not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("送门",[577, 945, 628, 962])
+                cond2=not testYGOScript.isInRect(pos,[737,616,778,668]) or not testYGOScript.exists_text("PvP",[717, 945, 752, 963])
                 if pos and cond1 and cond2:
                     facepos=pos
                     break
@@ -147,27 +147,23 @@ class testFindPasserby(testYGOScript):
             testYGOScript.my_scroll()
             sleep(2.5)
         testYGOScript.skip_talk()
-        testYGOScript.wait_text("Auto-Duel",[944,829,1082,859])
+        testYGOScript.wait_text("自动决斗",[952, 826, 1079, 864])
         touch([1011,843])
-        while(not testYGOScript.exists_text("OK",[805,900,874,931])):
+        while(not testYGOScript.exists_text("好",[815, 900, 859, 932])):
             sleep(0.2)
-        if testYGOScript.exists_text("OK",[809,900,874,931]):
+        if testYGOScript.exists_text("好",[815, 900, 859, 932]):
             touch([838,915])
         while(True):
             for i in range(0,3):
                 testYGOScript.press(cursor_pos=[497,821])
-            if testYGOScript.exists_text("NEXT",[779,892,893,938]):
+            if testYGOScript.exists_text("下一步",[792, 901, 881, 933]):
                 touch([842,917])
             pos=testYGOScript.my_exists(Template(r"imgFindPasserby\\2.JPG"))
             if pos:
                 touch(pos)
-            if testYGOScript.exists_text("Information",[1197,36,1312,60]):
+            if testYGOScript.exists_text("信息",[1194, 34, 1246, 63]):
                 break
 if __name__=="__main__":
-    suite=unittest.TestSuite()
-    suite.addTest(testBeforeScript("testBeforeScript"))
-    unittest.TextTestRunner().run(suite)
+    testBeforeScript.testBeforeScript()
     while(True):
-        suite=unittest.TestSuite()
-        suite.addTest(testFindPasserby("testFindPasserby"))
-        unittest.TextTestRunner().run(suite)
+        testFindPasserby.testFindPasserby()

@@ -29,6 +29,7 @@ tk.attributes("-topmost", True)
 tk.geometry("1664x936"+"+"+str(dev_pos[0])+"+"+str(dev_pos[1]))
 snapshot_rect=[]
 n=0
+frame=[]
 while True:
     tk.update_idletasks()
     tk.update()
@@ -37,7 +38,8 @@ while True:
         if state < 0 and state!=prestate:
             n+=1
             cursor_pos=win32api.GetCursorPos()
-            print(cursor_pos[0]-dev_pos[0],cursor_pos[1]-dev_pos[1])
+            frame.append(cursor_pos[0]-dev_pos[0])
+            frame.append(cursor_pos[1]-dev_pos[1])
             snapshot_rect.append(cursor_pos[0]-dev_pos[0])
             snapshot_rect.append(cursor_pos[1]-dev_pos[1])
             if n==2:
@@ -47,5 +49,6 @@ while True:
     time.sleep(0.01)
 area_img=crop_image(dev.snapshot(),snapshot_rect)
 img=preprocessImg(area_img)
-print(pytesseract.image_to_string(img,config="--psm 7 --oem 3"))
+print(frame)
+print(pytesseract.image_to_string(img,config="--psm 7 --oem 3",lang='chi_sim'))
 show_origin_size(img,"asd")
