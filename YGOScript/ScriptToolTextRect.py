@@ -26,7 +26,7 @@ win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
 dev_pos=dev.get_pos()
 tk.attributes("-alpha", 0.3)
 tk.attributes("-topmost", True)
-tk.geometry("1664x936"+"+"+str(dev_pos[0])+"+"+str(dev_pos[1]))
+tk.geometry("1792x1008"+"+"+str(dev_pos[0])+"+"+str(dev_pos[1]))
 snapshot_rect=[]
 n=0
 frame=[]
@@ -50,5 +50,5 @@ while True:
 area_img=crop_image(dev.snapshot(),snapshot_rect)
 img=preprocessImg(area_img)
 print(frame)
-print(pytesseract.image_to_string(img,config="--psm 7 --oem 3",lang='chi_sim'))
+print(pytesseract.image_to_string(img,config="--psm 7 --oem 3",lang='eng'))
 show_origin_size(img,"asd")

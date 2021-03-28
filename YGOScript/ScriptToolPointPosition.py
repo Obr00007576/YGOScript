@@ -18,7 +18,7 @@ win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
 dev_pos=dev.get_pos()
 tk.attributes("-alpha", 0.3)
 tk.attributes("-topmost", True)
-tk.geometry("1664x936"+"+"+str(dev_pos[0])+"+"+str(dev_pos[1]))
+tk.geometry("1792x1008"+"+"+str(dev_pos[0])+"+"+str(dev_pos[1]))
 while True:
     tk.update_idletasks()
     tk.update()
@@ -26,7 +26,7 @@ while True:
     if state!=state_release:
         if state < 0 and state!=prestate:
             cursor_pos=win32api.GetCursorPos()
-            print(cursor_pos[0]-dev_pos[0],cursor_pos[1]-dev_pos[1])
+            print([cursor_pos[0]-dev_pos[0],cursor_pos[1]-dev_pos[1]])
             tk.destroy()
             break
     prestate=state

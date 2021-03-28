@@ -42,12 +42,12 @@ class testYGOScript(unittest.TestCase):
             return pos
     #check whether the text is in the given fixed area of a rect
     @staticmethod
-    def exists_text(text,rect,angle=0):
+    def exists_text(text,rect,angle=0,lan="chi_sim"):
         img=crop_image(testYGOScript.dev.snapshot(),rect)
         if angle!=0:
             img=rotate_image(img,angle)
         img=preprocessImg(img)
-        textImg=pytesseract.image_to_string(img,lang="eng",config="--psm 7 --oem 3")
+        textImg=pytesseract.image_to_string(img,lang=lan,config="--psm 7 --oem 3")
         if text in textImg:
             return True
         return False
@@ -84,7 +84,7 @@ class testYGOScript(unittest.TestCase):
     def skip_talk():
         flag=False
         while True:
-            area_img=crop_image(testYGOScript.dev.snapshot(),[758,766,761,769])
+            area_img=crop_image(testYGOScript.dev.snapshot(),[1258, 1015, 1261, 1018])
             for line in area_img:
                 for pix in line:
                     if pix[0]==255 and pix[1]==255 and pix[2]==255:
@@ -92,12 +92,12 @@ class testYGOScript(unittest.TestCase):
             if flag:
                 break
         while True:
-            area_img=crop_image(testYGOScript.dev.snapshot(),[758,766,761,769])
+            area_img=crop_image(testYGOScript.dev.snapshot(),[1258, 1015, 1261, 1018])
             for line in area_img:
                 for pix in line:
                     if pix[0]!=255 or pix[1]!=255 or pix[2]!=255:
                         return
-            testYGOScript.press(cursor_pos=[817,877])
+            testYGOScript.press(cursor_pos=[858, 906])
 
 #preparation for the tests later - to set the dev as the application
 class testBeforeScript(testYGOScript):
@@ -111,59 +111,53 @@ class testBeforeScript(testYGOScript):
 #steps of entering the door
 class testEnterTheDoor(testYGOScript):
     def testEnterTheDoor():
-        if testYGOScript.exists_text("Information",[1197,36,1312,60]):
-            touch([947,440])
-        wait(Template(r"imgEnterTheDoor\\2.JPG"))
-        pos=exists(Template(r"imgEnterTheDoor\\2.JPG"))
+        if testYGOScript.exists_text("信息",[1286, 35, 1339, 60]):
+            touch([1025, 473])
+        wait(Template(r"imgEnterTheDoor\\1.JPG"))
+        pos=exists(Template(r"imgEnterTheDoor\\1.JPG"))
         if pos:
             touch(pos)
         sleep(0.5)
         testYGOScript.skip_talk()
-        wait(Template(r"imgEnterTheDoor\\2.JPG"))
-        pos=exists(Template(r"imgEnterTheDoor\\2.JPG"))
+        wait(Template(r"imgEnterTheDoor\\1.JPG"))
+        pos=exists(Template(r"imgEnterTheDoor\\1.JPG"))
         if pos:
             touch(pos)
         while True:
-            if testYGOScript.exists_text("Your Main Phase",[937,79,1107,103]) or testYGOScript.exists_text("Your Draw Phase",[937,79,1107,103]):
+            if testYGOScript.exists_text("你",[1035, 82, 1052, 101]):
                 break
-            testYGOScript.press(cursor_pos=[817,516])
-        sleep(0.5)
+            testYGOScript.press(cursor_pos=[900, 496])
 
 #steps of battle
 class testDueling(testYGOScript):
-    ATKrects=[[792,593,826,611],[899,593,933,610],[685,594,717,612]]
-    SwipePos=[[[839,583],[839,450]],[[950,583],[950,450]],[[732,583],[732,450]]]
+    ATKrects=[[850, 634, 887, 658],[963, 634, 1002, 658],[722, 627, 777, 660]]
+    SwipePos=[[[901, 600],[901,470]],[[1017, 600],[1017,470]],[[785, 600],[785,470]]]
     
     #operations of your draw phase
     def testDrawPhase():
-        if testYGOScript.exists_text("Your Draw Phase",[937,79,1107,103]):
-            sleep(1)
-            for i in range(0,9):
-                sleep(0.1)
-                testYGOScript.press([834,506])
+        sleep(1)
+        for i in range(0,9):
+            sleep(0.1)
+            testYGOScript.press([900, 496])
     
     #operations of your main phase
     def testMainPhase():
-        if testYGOScript.exists_text("Your Main Phase",[937,79,1107,103]):
-            if not testYGOScript.exists_text("ATK",testDueling.ATKrects[2]):
-                testYGOScript.dev.touch([830,906])
-                wait(Template(r"imgDueling\\1.JPG"))
-                pos=exists(Template(r"imgDueling\\1.JPG"))
-                if pos:
-                    touch(pos)
-            wait(Template(r"imgDueling\\2.JPG"))
-            pos=exists(Template(r"imgDueling\\2.JPG"))
-            if pos:
-                touch(pos)
-                sleep(0.1)
-                touch(pos)
+        if not testYGOScript.exists_text("T",testDueling.ATKrects[2]):
+            testYGOScript.dev.touch([865,972])
+            sleep(0.3)
+            touch([831, 776])
+        wait(Template(r"imgDueling\\2.JPG"))
+        pos=exists(Template(r"imgDueling\\2.JPG"))
+        if pos:
+            touch(pos)
+            sleep(0.1)
+            touch(pos)
     
     #operations of your battle phase
     def testBattlePhase():
-        if testYGOScript.exists_text("Your Battle Phase",[937,79,1107,103]):
-            for i in range(0,3):
-                if testDueling.isAttackToLose(i):
-                    return True
+        for i in range(0,3):
+            if testDueling.isAttackToWin(i):
+                return True
         wait(Template(r"imgDueling\\2.JPG"))
         pos=exists(Template(r"imgDueling\\2.JPG"))
         if pos:
@@ -174,40 +168,36 @@ class testDueling(testYGOScript):
         return False
 
     #check whether after this attack the enemy get 0 LP
-    def isAttackToLose(boardIndex):
-        if testYGOScript.exists_text("TK",testDueling.ATKrects[boardIndex]):
+    def isAttackToWin(boardIndex):
+        if testYGOScript.exists_text("T",testDueling.ATKrects[boardIndex]):
             testYGOScript.my_swipe(testDueling.SwipePos[boardIndex][0],testDueling.SwipePos[boardIndex][1])
             for i in range(0,2):
                 sleep(0.1)
                 testYGOScript.press(stop=True)
             sleep(1.5)
-            if testYGOScript.exists_text("LP: O",[1572,854,1659,898]) or testYGOScript.exists_text("LP: o",[1572,854,1659,898]):
-                while(not testYGOScript.exists_text("OK",[809,900,874,931])):
+            if testYGOScript.exists_text("LP: O",[1696, 925, 1783, 964],lan='eng') or testYGOScript.exists_text("LP: o",[1696, 925, 1783, 964],lan='eng'):
+                while(not testYGOScript.exists_text("好",[877, 970, 930, 1004])):
                     sleep(0.2)
-                if testYGOScript.exists_text("OK",[809,900,874,931]):
-                    touch([838,915])
+                touch([905,990])
                 return True
         return False
     
     #dueling
     def testDueling():
+        if testYGOScript.exists_text("1",[1126, 32, 1159, 78]):
+            testDueling.testMainPhase()
+            while(not testYGOScript.exists_text("你",[1035, 82, 1054, 101])):
+                pass
         for i in range(0,20):
-            if testYGOScript.exists_text("Your Main Phase",[937,79,1107,103]):
-                testDueling.testMainPhase()
-            else:
-                while not testYGOScript.exists_text("Your Draw Phase",[937,79,1107,103]):
-                    if testYGOScript.exists_text("LP: O",[1572,854,1659,898]) or testYGOScript.exists_text("LP: o",[1572,854,1659,898]):
-                        while(not testYGOScript.exists_text("OK",[809,900,874,931])):
-                            sleep(0.2)
-                        if testYGOScript.exists_text("OK",[809,900,874,931]):
-                            touch([838,915])
-                        return
-                testDueling.testDrawPhase()
-                testYGOScript.wait_text("Your Main Phase",[937,79,1107,103])
-                testDueling.testMainPhase()
-                testYGOScript.wait_text("Your Battle Phase",[937,79,1107,103])
-                if testDueling.testBattlePhase():
-                    return
+            testYGOScript.wait_text("抽卡",[1081, 76, 1132, 104])
+            testDueling.testDrawPhase()
+            testYGOScript.wait_text("行动",[1081, 76, 1132, 104])
+            testDueling.testMainPhase()
+            testYGOScript.wait_text("战斗",[1081, 76, 1132, 104])
+            if testDueling.testBattlePhase():
+                return
+            while(not testYGOScript.exists_text("你",[1035, 82, 1054, 101])):
+                pass
 
 #steps to end the battle to the main interface
 class testEnd(testYGOScript):
@@ -215,12 +205,10 @@ class testEnd(testYGOScript):
         while(True):
             for i in range(0,3):
                 testYGOScript.press(cursor_pos=[844,832])
-            if testYGOScript.exists_text("NEXT",[751,899,915,934]):
-                touch([840,919])
             pos=testYGOScript.my_exists(Template(r"imgEnd\\1.JPG"))
             if pos:
                 touch(pos)
-            if testYGOScript.exists_text("Information",[1197,36,1312,60]):
+            if testYGOScript.exists_text("信息",[1286, 35, 1339, 60]):
                 break
 
 if __name__=="__main__":

@@ -138,7 +138,8 @@ class testFindPasserby(testYGOScript):
             for pos in testFindPasserby.recognizeFaces():
                 cond1=not testYGOScript.isInRect(pos,[635,490,737,632]) or not testYGOScript.exists_text("送门",[577, 945, 628, 962])
                 cond2=not testYGOScript.isInRect(pos,[737,616,778,668]) or not testYGOScript.exists_text("PvP",[717, 945, 752, 963])
-                if pos and cond1 and cond2:
+                cond3=not testYGOScript.isInRect(pos,[640, 684, 763, 794]) or not testYGOScript.exists_text("送门",[577, 945, 628, 962])
+                if pos and cond1 and cond2 and cond3:
                     facepos=pos
                     break
             if facepos!=None:
