@@ -82,20 +82,23 @@ class testYGOScript(unittest.TestCase):
 
     @staticmethod
     def skip_talk():
-        flag=False
+        flag=True
         while True:
-            area_img=crop_image(testYGOScript.dev.snapshot(),[1258, 1015, 1261, 1018])
+            area_img=crop_image(testYGOScript.dev.snapshot(),[883, 1009, 886, 1012])
             for line in area_img:
                 for pix in line:
-                    if pix[0]==255 and pix[1]==255 and pix[2]==255:
-                        flag=True
+                    if tuple(pix)!=(255,255,255):
+                        flag=False
+                        break
             if flag:
                 break
+            flag=True
         while True:
-            area_img=crop_image(testYGOScript.dev.snapshot(),[1258, 1015, 1261, 1018])
+            area_img=crop_image(testYGOScript.dev.snapshot(),[883, 1009, 886, 1012])
             for line in area_img:
                 for pix in line:
-                    if pix[0]!=255 or pix[1]!=255 or pix[2]!=255:
+                    if tuple(pix)!=(255,255,255):
+                        a=tuple(pix)
                         return
             testYGOScript.press(cursor_pos=[858, 906])
 
@@ -117,7 +120,6 @@ class testEnterTheDoor(testYGOScript):
         pos=exists(Template(r"imgEnterTheDoor\\1.JPG"))
         if pos:
             touch(pos)
-        sleep(0.5)
         testYGOScript.skip_talk()
         wait(Template(r"imgEnterTheDoor\\1.JPG"))
         pos=exists(Template(r"imgEnterTheDoor\\1.JPG"))
@@ -162,7 +164,7 @@ class testDueling(testYGOScript):
         pos=exists(Template(r"imgDueling\\2.JPG"))
         if pos:
             touch(pos)
-            sleep(0.1)
+            sleep(0.3)
             touch(pos)
         sleep(3)
         return False
